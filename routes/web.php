@@ -5,6 +5,7 @@ use App\Http\Controllers\TaskController; // Importamos nuestro controlador de ta
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -38,5 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->middleware('auth')->name('tasks.update');
 });
+
+// Rutas de Reseñas
+Route::get('/reviews', [ReviewController::class, 'index'])->middleware('auth')->name('reviews.index');
+Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')->name('reviews.store');
 
 require __DIR__.'/auth.php';

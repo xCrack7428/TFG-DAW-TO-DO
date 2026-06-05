@@ -216,8 +216,14 @@ const deleteTask = (taskId) => {
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
-                <Link :href="route('profile.edit')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">⚙️ Ajustes</Link>
+            <!-- NUEVO: Botón de Comunidad añadido al menú lateral -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                <Link :href="route('reviews.index')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 rounded-lg transition-colors">
+                    ⭐ Comunidad
+                </Link>
+                <Link :href="route('profile.edit')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                    ⚙️ Ajustes
+                </Link>
             </div>
         </aside>
 

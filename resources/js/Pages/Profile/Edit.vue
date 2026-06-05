@@ -20,7 +20,7 @@ const showSuccessMessage = ref(false);
 const user = usePage().props.auth.user;
 const isProfileMenuOpen = ref(false); // Control del menú
 
-// --- NUEVO: SISTEMA DE NOTIFICACIONES ---
+// --- SISTEMA DE NOTIFICACIONES ---
 const notifications = ref([]);
 
 const showNotification = (message, type = 'success') => {
@@ -103,7 +103,11 @@ const saveSettings = () => {
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
+            <!-- NUEVO: Botón de Comunidad y Ajustes -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                <Link :href="route('reviews.index')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 rounded-lg transition-colors">
+                    ⭐ Comunidad
+                </Link>
                 <div class="flex items-center gap-3 px-4 py-2 bg-indigo-50 dark:bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 dark:border-indigo-500 rounded-lg font-semibold">
                     ⚙️ Ajustes
                 </div>
