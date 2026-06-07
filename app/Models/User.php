@@ -14,7 +14,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Los atributos que son asignables masivamente.
      *
      * @var list<string>
      */
@@ -25,7 +25,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Los atributos que deben ser ocultados para las serializaciones.
      *
      * @var list<string>
      */
@@ -35,7 +35,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Los atributos que deben ser convertidos a tipos nativos.
      *
      * @return array<string, string>
      */
@@ -47,10 +47,13 @@ class User extends Authenticatable
         ];
     }
 
+    // Relación con el modelo Task
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
+
+    // Relación con el modelo Review
     public function reviews()
     {
         return $this->hasMany(Review::class);

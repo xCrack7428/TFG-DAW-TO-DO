@@ -34,7 +34,7 @@ const submit = () => {
             <form @submit.prevent="submit">
                 <!-- NOMBRE COMPLETO -->
                 <div class="mb-4">
-                    <label for="name" class="block text-xs font-bold text-gray-300 mb-1 uppercase">Nombre completo</label>
+                    <label for="name" class="block text-xs font-bold text-gray-300 mb-1">Nombre completo</label>
                     <input id="name" type="text" v-model="form.name" required autofocus autocomplete="name"
                         class="w-full bg-[#13131A] border border-gray-700 rounded-md px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"
                         placeholder="John Doe">
@@ -43,7 +43,7 @@ const submit = () => {
 
                 <!-- EMAIL -->
                 <div class="mb-4">
-                    <label for="email" class="block text-xs font-bold text-gray-300 mb-1 uppercase">Email</label>
+                    <label for="email" class="block text-xs font-bold text-gray-300 mb-1">Email</label>
                     <input id="email" type="email" v-model="form.email" required autocomplete="username"
                         class="w-full bg-[#13131A] border border-gray-700 rounded-md px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"
                         placeholder="tu@email.com">
@@ -52,7 +52,7 @@ const submit = () => {
 
                 <!-- CONTRASEÑA -->
                 <div class="mb-4">
-                    <label for="password" class="block text-xs font-bold text-gray-300 mb-1 uppercase">Contraseña</label>
+                    <label for="password" class="block text-xs font-bold text-gray-300 mb-1">Contraseña</label>
                     <input id="password" type="password" v-model="form.password" required autocomplete="new-password"
                         class="w-full bg-[#13131A] border border-gray-700 rounded-md px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"
                         placeholder="••••••••">
@@ -61,7 +61,7 @@ const submit = () => {
 
                 <!-- CONFIRMAR CONTRASEÑA -->
                 <div class="mb-6">
-                    <label for="password_confirmation" class="block text-xs font-bold text-gray-300 mb-1 uppercase">Confirmar contraseña</label>
+                    <label for="password_confirmation" class="block text-xs font-bold text-gray-300 mb-1">Confirmar contraseña</label>
                     <input id="password_confirmation" type="password" v-model="form.password_confirmation" required autocomplete="new-password"
                         class="w-full bg-[#13131A] border border-gray-700 rounded-md px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500 transition-colors"
                         placeholder="••••••••">
@@ -70,29 +70,12 @@ const submit = () => {
 
                 <!-- BOTÓN PRINCIPAL -->
                 <button type="submit" :disabled="form.processing"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-md transition-colors flex justify-center items-center disabled:opacity-50 uppercase text-sm tracking-wide">
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-md transition-colors flex justify-center items-center disabled:opacity-50 shadow-lg shadow-indigo-600/20">
                     Registrarse
                 </button>
 
-                <!-- SEPARADOR -->
-                <div class="relative flex items-center py-6">
-                    <div class="flex-grow border-t border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-500 text-xs">O continuar con</span>
-                    <div class="flex-grow border-t border-gray-700"></div>
-                </div>
-
-                <!-- BOTONES SOCIALES (Estéticos por ahora) -->
-                <div class="flex gap-4 mb-6">
-                    <button type="button" class="flex-1 bg-[#13131A] border border-gray-700 rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors cursor-not-allowed opacity-70" title="Próximamente">
-                        <span class="text-sm font-medium text-gray-300">Google</span>
-                    </button>
-                    <button type="button" class="flex-1 bg-[#13131A] border border-gray-700 rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors cursor-not-allowed opacity-70" title="Próximamente">
-                        <span class="text-sm font-medium text-gray-300">GitHub</span>
-                    </button>
-                </div>
-
                 <!-- ENLACE A LOGIN -->
-                <div class="text-center text-sm text-gray-400">
+                <div class="text-center text-sm text-gray-400 mt-8 pt-6 border-t border-gray-800">
                     ¿Ya tienes una cuenta? 
                     <Link :href="route('login')" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
                         Iniciar Sesión

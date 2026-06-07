@@ -11,7 +11,7 @@ class ReviewController extends Controller
 {
     public function index()
     {
-        // Cogemos todas las reseñas y el nombre de su autor, de más nueva a más antigua
+        // Coge todas las reseñas y el nombre de su autor, de la más nueva a la más antigua
         $reviews = Review::with('user')->latest()->get();
 
         return Inertia::render('Reviews/Index', [
@@ -19,6 +19,9 @@ class ReviewController extends Controller
         ]);
     }
 
+    /**
+     * Guarda una nueva reseña en la base de datos.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([

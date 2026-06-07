@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Ejecuta las migraciones.
      */
     public function up(): void
     {
@@ -16,7 +16,7 @@ return new class extends Migration
             // Relación con el usuario (si borras el usuario, se borran sus tareas)
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
             
-            // Datos de la tarea basados en el diseño de Figma
+            // Datos de las tareas basados en el diseño de Figma
             $table->string('title');
             $table->text('description')->nullable(); // nullable() permite que esté vacío
             $table->date('due_date')->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Revierte las migraciones.
      */
     public function down(): void
     {

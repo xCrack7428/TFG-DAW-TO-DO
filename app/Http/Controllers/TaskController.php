@@ -75,7 +75,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        // Verificamos que la tarea pertenezca al usuario logueado
+        // Verifica que la tarea pertenezca al usuario logueado
         if ($task->user_id === Auth::id()) {
             $validated = $request->validate([
                 'title' => 'required|string|max:255',

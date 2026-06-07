@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Ejecuta la migración para crear la tabla de reseñas en la base de datos.
      */
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            // Relacionamos la reseña con el usuario que la escribe
+            // Relaciona la reseña con el usuario que la escribe
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             
             $table->integer('rating'); 
@@ -24,7 +24,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Revierte las migraciones.
      */
     public function down(): void
     {

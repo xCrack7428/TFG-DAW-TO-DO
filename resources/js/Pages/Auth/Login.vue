@@ -36,7 +36,7 @@ const submit = () => {
             <h2 class="text-2xl font-bold text-white text-center mt-4">Bienvenido de nuevo</h2>
             <p class="text-sm text-gray-400 text-center mt-2 mb-8">Inicia sesión para gestionar tus tareas.</p>
 
-            <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
+            <div v-if="status" class="mb-4 font-medium text-sm text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-md">
                 {{ status }}
             </div>
 
@@ -66,29 +66,12 @@ const submit = () => {
 
                 <!-- BOTÓN PRINCIPAL -->
                 <button type="submit" :disabled="form.processing"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-md transition-colors flex justify-center items-center disabled:opacity-50">
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-md transition-colors flex justify-center items-center disabled:opacity-50 shadow-lg shadow-indigo-600/20">
                     Iniciar Sesión
                 </button>
 
-                <!-- SEPARADOR -->
-                <div class="relative flex items-center py-6">
-                    <div class="flex-grow border-t border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-500 text-xs">O continuar con</span>
-                    <div class="flex-grow border-t border-gray-700"></div>
-                </div>
-
-                <!-- BOTONES SOCIALES (Estéticos por ahora) -->
-                <div class="flex gap-4 mb-6">
-                    <button type="button" class="flex-1 bg-[#13131A] border border-gray-700 rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors cursor-not-allowed opacity-70" title="Próximamente">
-                        <span class="text-sm font-medium text-gray-300">Google</span>
-                    </button>
-                    <button type="button" class="flex-1 bg-[#13131A] border border-gray-700 rounded-md py-2 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors cursor-not-allowed opacity-70" title="Próximamente">
-                        <span class="text-sm font-medium text-gray-300">GitHub</span>
-                    </button>
-                </div>
-
                 <!-- ENLACE A REGISTRO -->
-                <div class="text-center text-sm text-gray-400">
+                <div class="text-center text-sm text-gray-400 mt-8 pt-6 border-t border-gray-800">
                     ¿No tienes una cuenta? 
                     <Link :href="route('register')" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
                         Regístrate

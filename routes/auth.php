@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Todas las rutas relacionadas con la autenticación se definen aquí. Estas rutas están agrupadas por middleware para garantizar que solo los usuarios invitados puedan acceder a las páginas de registro y inicio de sesión, mientras que los usuarios autenticados pueden acceder a las páginas de verificación de correo electrónico, confirmación de contraseña y cierre de sesión.
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
@@ -35,6 +36,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
+// Rutas protegidas por el middleware 'auth' que requieren que el usuario esté autenticado para acceder a ellas. Estas rutas incluyen la verificación de correo electrónico, la confirmación de contraseña, la actualización de la contraseña y el cierre de sesión.
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
