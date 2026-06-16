@@ -6,6 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\AIAssistantController; // Importamos el controlador del Asistente IA
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -45,4 +47,16 @@ Route::middleware('auth')->group(function () {
 Route::get('/reviews', [ReviewController::class, 'index'])->middleware('auth')->name('reviews.index');
 Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')->name('reviews.store');
 
-require __DIR__.'/auth.php';
+// Rutas de Autenticación Social
+Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
+
+
+
+Route::middleware('auth')->group(function () {
+
+    // Ruta del Asistente IA
+    Route::post('/ai/analyze', [AIAssistantController::class, 'analyzeTasks'])->name('ai.analyze');
+});
+
+require __DIR__ . '/auth.php';
