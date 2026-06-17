@@ -1,12 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link, useForm, router, usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const props = defineProps({
     tasks: Array
 });
 
-// --- OBTENER DATOS DEL USUARIO REAL ---
+// OBTENER LOS DATOS DEL USUARIO REAL 
 const user = usePage().props.auth.user;
 const userInitials = computed(() => {
     if (!user.name) return 'U';
@@ -19,6 +20,65 @@ const userInitials = computed(() => {
 
 const isModalOpen = ref(false);
 const searchQuery = ref('');
+
+// ASISTENTE IA
+const cargandoIA = ref(false);
+const respuestaIA = ref(null);
+const tareaSugerida = ref(null);
+const categoriaSugerida = ref('Personal');
+
+const analizarConIA = async () => {
+    cargandoIA.value = true;
+    respuestaIA.value = null;
+    tareaSugerida.value = null; // Limpiamos sugerencias anteriores
+
+    try {
+        const response = await axios.post('/ai/analyze', {
+            tab: activeTab.value
+        });
+        
+        if (response.data.success) {
+            respuestaIA.value = response.data.message;
+            
+            // Filtro anti-bugs: Si la IA devuelve la palabra "null", lo limpiamos de verdad
+            if (response.data.suggested_task === 'null' || response.data.suggested_task === 'Ninguna' || response.data.suggested_task === '') {
+                tareaSugerida.value = null;
+            } else {
+                tareaSugerida.value = response.data.suggested_task;
+            }
+            
+            categoriaSugerida.value = response.data.suggested_category;
+        } else {
+            showNotification('Ups, algo falló procesando la respuesta.', 'error');
+        }
+    } catch (error) {
+        console.error("Error IA:", error);
+        showNotification('El asistente está desconectado. Revisa tu conexión.', 'error');
+    } finally {
+        cargandoIA.value = false;
+    }
+};
+
+// Función para cuando el usuario hace clic en el botón de la sugerencia
+// Función para cuando el usuario hace clic en el botón de la sugerencia
+const aceptarSugerenciaIA = () => {
+    // 1. Limpiamos cualquier estado de edición previo
+    editingTask.value = null;
+    form.clearErrors();
+
+    // 2. Rellenamos el formulario con los datos de la IA
+    form.title = tareaSugerida.value;
+    form.description = '✨ Sugerencia de la IA de DAW TO DO';
+    form.due_date = todayDateString;
+    form.priority = 'Media';
+    form.category = categoriaSugerida.value || 'Personal';
+    
+    // 3. Abrimos el modal para que el usuario pueda editar y confirmar
+    isModalOpen.value = true; 
+    
+    // 4. Ocultamos la sugerencia de la IA para limpiar la pantalla
+    tareaSugerida.value = null; 
+};
 
 // Controla el estado del menú desplegable del perfil
 const isProfileMenuOpen = ref(false);
@@ -190,7 +250,6 @@ const deleteTask = (taskId) => {
     <div class="flex h-screen bg-gray-50 dark:bg-[#13131A] text-gray-800 dark:text-gray-200 font-sans relative transition-colors duration-300">
         
         <aside class="w-64 bg-white dark:bg-[#181820] border-r border-gray-200 dark:border-gray-800 flex flex-col hidden md:flex transition-colors duration-300 relative z-10">
-            <!-- Zona superior flexible -->
             <div class="flex-1 flex flex-col overflow-y-auto">
                 <div class="h-20 flex-shrink-0 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
                     <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -216,7 +275,6 @@ const deleteTask = (taskId) => {
                     </div>
                 </nav>
 
-                <!-- CARTEL DE NOVEDADES AMPLIADO -->
                 <div class="mt-auto mx-4 mb-4 p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-xl">🚀</span>
@@ -242,7 +300,6 @@ const deleteTask = (taskId) => {
                 </div>
             </div>
 
-            <!-- Footer del menú lateral -->
             <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2 flex-shrink-0">
                 <Link :href="route('reviews.index')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 rounded-lg transition-colors">
                     ⭐ Comunidad
@@ -269,7 +326,6 @@ const deleteTask = (taskId) => {
                         </svg>
                     </button>
 
-                    <!-- MENÚ DESPLEGABLE DEL PERFIL -->
                     <div class="relative z-50">
                         <button @click="isProfileMenuOpen = !isProfileMenuOpen" class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm text-white shadow-lg hover:shadow-indigo-500/30 transition-all transform hover:scale-105 focus:outline-none relative z-50">
                             {{ userInitials }}
@@ -300,7 +356,6 @@ const deleteTask = (taskId) => {
                         </transition>
                     </div>
 
-                    <!-- EFECTO BLUR PARA EL FONDO CUANDO EL MENÚ ESTÁ ABIERTO -->
                     <transition
                         enter-active-class="transition-opacity ease-linear duration-300"
                         enter-from-class="opacity-0"
@@ -341,6 +396,63 @@ const deleteTask = (taskId) => {
                     </button>
                 </div>
 
+                <div class="mb-8 p-5 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-[#181820] dark:to-[#1c1c24] border border-indigo-100 dark:border-purple-900/30 rounded-2xl shadow-sm relative overflow-hidden transition-all duration-300">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="text-xl">✨</span> Asistente Inteligente
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Deja que la IA analice tus tareas y te aconseje por dónde empezar.
+                            </p>
+                        </div>
+                        <button 
+                            @click="analizarConIA" 
+                            :disabled="cargandoIA"
+                            class="flex-shrink-0 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            <svg v-if="cargandoIA" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>{{ cargandoIA ? 'Analizando...' : 'Analizar mi día' }}</span>
+                        </button>
+                    </div>
+
+                    <transition
+                        enter-active-class="transition ease-out duration-500"
+                        enter-from-class="opacity-0 translate-y-4"
+                        enter-to-class="opacity-100 translate-y-0"
+                    >
+                        <div v-if="respuestaIA" class="mt-5 pt-5 border-t border-indigo-100/50 dark:border-gray-700/50 relative z-10">
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 text-white shadow-md text-lg">
+                                    🤖
+                                </div>
+                                <div class="w-full">
+                                    <p class="text-xs font-bold text-purple-600 dark:text-purple-400 mb-1 uppercase tracking-wider">Consejo de DAW TO DO</p>
+                                    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                                        "{{ respuestaIA }}"
+                                    </p>
+                                    
+                                    <div v-if="tareaSugerida" class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-white dark:bg-[#13131A] rounded-xl border border-indigo-100 dark:border-indigo-900/50 shadow-sm inline-flex">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">DAW TO DO te propone un nuevo reto:</span>
+                                            <span class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ tareaSugerida }}</span>
+                                        </div>
+                                        <button @click="aceptarSugerenciaIA" class="mt-2 sm:mt-0 sm:ml-2 px-4 py-1.5 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5">
+                                            <span>➕ Añadir a mi lista</span>
+                                        </button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+                </div>
+                
                 <div v-if="filteredTasks.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
                     <div class="text-7xl mb-6 opacity-80">{{ searchQuery ? '🔍' : (activeTab === 'Hoy' ? '☀️' : '🧘‍♂️') }}</div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">

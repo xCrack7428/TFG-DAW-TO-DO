@@ -5,55 +5,85 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Task; // Asegúrate de que este es tu modelo de tareas
+use App\Models\Task;
 
 class AIAssistantController extends Controller
 {
-    public function analyzeTasks()
+    public function analyzeTasks(Request $request) 
     {
-        $user = Auth::user();
-
-        // Buscamos las tareas pendientes del usuario logueado.
-        // ADAPTA ESTO a tu base de datos: asumimos que hay un campo 'is_completed' o 'status'
-        $pendingTasks = Task::where('user_id', $user->id)
-            ->where('status', 'pending') // Cambia 'status' por el nombre de tu columna
-            ->get();
-
-        // 1. Preparamos el Prompt dependiendo de si hay tareas o no
-        if ($pendingTasks->isEmpty()) {
-            $prompt = "Actúa como el asistente virtual oficial de una aplicación de productividad llamada 'DAW TO DO'. El usuario actual no tiene ninguna tarea pendiente registrada. Empieza saludando exactamente con: 'Bienvenido a DAW TO DO, vamos a empezar a gestionar tus tareas'. Después, anímale brevemente en un par de frases a crear su primera tarea y explícale un beneficio rápido de organizar su día. Sé cercano, motivador y usa algún emoji.";
-        } else {
-            // Extraemos solo los títulos de las tareas
-            $taskNames = $pendingTasks->pluck('title')->implode(', ');
-
-            $prompt = "Actúa como un coach de productividad para la aplicación 'DAW TO DO'. El usuario tiene estas tareas pendientes hoy: " . $taskNames . ". Dale un consejo breve y motivador sobre por cuál empezar (por ejemplo, la más difícil primero o agrupar similares) y cómo organizar su tiempo. Sé conciso, directo, usa algún emoji y no hagas listas largas.";
-        }
-
-        // 2. Hacemos la llamada a la API de Gemini (Versión 1.5 Flash)
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . env('GEMINI_API_KEY'), [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ]
-            ]);
+            $user = Auth::user();
+            $hoy = now()->toDateString();
+            
+            $tab = $request->input('tab', 'Hoy');
+            $query = Task::where('user_id', $user->id)->where('status', 'pending');
 
-            // 3. Extraemos el texto de la respuesta
-            $aiText = $response->json()['candidates'][0]['content']['parts'][0]['text'];
+            $contextoTexto = "";
+            if ($tab === 'Hoy') {
+                $query->whereDate('due_date', $hoy);
+                $contextoTexto = "para hoy";
+            } elseif ($tab === 'Próximas Tareas') {
+                $query->whereDate('due_date', '>', $hoy);
+                $contextoTexto = "para los próximos días";
+            } else {
+                $contextoTexto = "en tu bandeja general";
+            }
+
+            $pendingTasks = $query->get();
+
+            if ($pendingTasks->isEmpty()) {
+                $tareasActuales = "Ninguna.";
+            } else {
+                // AQUÍ LE PASAMOS LA PRIORIDAD JUNTO AL TÍTULO A LA IA
+                $tareasActuales = $pendingTasks->map(function ($task) {
+                    return "'" . $task->title . "' (Prioridad: " . $task->priority . ")";
+                })->implode(', ');
+            }
+
+            // EL PROMPT CON REGLAS DE PRIORIDAD
+            $prompt = "Eres un coach de productividad para la app DAW TO DO. El usuario está en la sección '$tab' y sus tareas pendientes $contextoTexto son: $tareasActuales. 
+            REGLAS ESTRICTAS:
+            1. Responde ÚNICAMENTE en formato JSON. Nada de texto fuera del JSON.
+            2. El JSON debe tener exactamente esta estructura: {\"mensaje\": \"tu consejo aquí\", \"tarea_sugerida\": \"título de tarea o null\", \"categoria\": \"Personal/Estudios/Trabajo/Otros\"}
+            3. En 'mensaje', da un consejo directo y conversacional usando emojis.
+            4. REGLA DE PRIORIDADES: Si NO vas a sugerir una tarea nueva, analiza las tareas actuales del usuario y recomiéndale por cuál empezar siguiendo este orden exacto: PRIMERO busca si hay alguna con Prioridad 'Alta' y dile que empiece por esa. Si no hay altas, busca una 'Media'. Si tampoco hay, elige una 'Baja'. Explícale brevemente por qué empezar por esa.
+            5. A veces (aleatoriamente, 50% de las veces), sugiere una tarea nueva positiva que el usuario no tenga (ej: 'Leer 10 páginas', 'Beber agua'). Si quieres sugerirla, pon el título en 'tarea_sugerida' y su categoría en 'categoria'. En tu 'mensaje' pregúntale si quiere que se la añadas (ignorando la regla 4).
+            6. Si no vas a sugerir ninguna tarea, asegúrate de que el valor de 'tarea_sugerida' sea null (el valor nulo de JSON, nunca la palabra \"null\" escrita).";
+
+            $response = Http::withoutVerifying()
+                ->withToken(env('GROQ_API_KEY'))
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => 'llama-3.1-8b-instant',
+                    'messages' => [
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ],
+                    'response_format' => ['type' => 'json_object'],
+                    'temperature' => 0.8, 
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ERROR DE GROQ: ' . $response->body()
+                ], 500);
+            }
+
+            $aiData = json_decode($response->json()['choices'][0]['message']['content'], true);
 
             return response()->json([
                 'success' => true,
-                'message' => $aiText
+                'message' => $aiData['mensaje'] ?? 'Aquí tienes tu consejo.',
+                'suggested_task' => $aiData['tarea_sugerida'] ?? null,
+                'suggested_category' => $aiData['categoria'] ?? 'Personal'
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vaya, parece que el asistente IA está durmiendo. Inténtalo de nuevo más tarde.'
+                'message' => 'ERROR EN LARAVEL: ' . $e->getMessage()
             ], 500);
         }
     }

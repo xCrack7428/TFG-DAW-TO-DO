@@ -287,7 +287,7 @@ const saveSettings = () => {
                             </div>
                             <div>
                                 <p class="text-gray-500 dark:text-gray-400 mb-1">Versión</p>
-                                <p class="font-semibold text-gray-900 dark:text-white">1.0.0 (Release Candidate)</p>
+                                <p class="font-semibold text-gray-900 dark:text-white">1.0.0</p>
                             </div>
                             <div>
                                 <p class="text-gray-500 dark:text-gray-400 mb-1">Año Académico</p>

@@ -51,8 +51,6 @@ Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')-
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
 
-
-
 Route::middleware('auth')->group(function () {
 
     // Ruta del Asistente IA
