@@ -11,10 +11,10 @@ class Task extends Model
 
     // 1. Permitir que estos campos se guarden en la base de datos
     protected $fillable = [
-        'title', 
-        'description', 
-        'due_date', 
-        'priority', 
+        'title',
+        'description',
+        'due_date',
+        'priority',
         'category',
         'status'
     ];
@@ -23,5 +23,10 @@ class Task extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function subtasks()
+    {
+        return $this->hasMany(Subtask::class);
     }
 }

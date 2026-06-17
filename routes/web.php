@@ -57,4 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/ai/analyze', [AIAssistantController::class, 'analyzeTasks'])->name('ai.analyze');
 });
 
+// Rutas de Subtareas
+Route::post('/tasks/{task}/subtasks', [App\Http\Controllers\SubtaskController::class, 'store'])->name('subtasks.store');
+Route::patch('/subtasks/{subtask}/toggle', [App\Http\Controllers\SubtaskController::class, 'toggle'])->name('subtasks.toggle');
+
 require __DIR__ . '/auth.php';

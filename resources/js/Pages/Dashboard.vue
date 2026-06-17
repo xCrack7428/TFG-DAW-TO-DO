@@ -60,7 +60,6 @@ const analizarConIA = async () => {
 };
 
 // Función para cuando el usuario hace clic en el botón de la sugerencia
-// Función para cuando el usuario hace clic en el botón de la sugerencia
 const aceptarSugerenciaIA = () => {
     // 1. Limpiamos cualquier estado de edición previo
     editingTask.value = null;
@@ -78,6 +77,26 @@ const aceptarSugerenciaIA = () => {
     
     // 4. Ocultamos la sugerencia de la IA para limpiar la pantalla
     tareaSugerida.value = null; 
+};
+
+// FUNCIONES DE SUBTAREAS (SUBCATEGORIAS)
+const addSubtask = (taskId, event) => {
+    const title = event.target.value.trim();
+    if (!title) return;
+    
+    router.post(route('subtasks.store', taskId), { title: title }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            event.target.value = ''; // Limpiamos el input
+            showNotification('Subtarea añadida', 'success');
+        }
+    });
+};
+
+const toggleSubtask = (subtaskId) => {
+    router.patch(route('subtasks.toggle', subtaskId), {}, {
+        preserveScroll: true
+    });
 };
 
 // Controla el estado del menú desplegable del perfil
@@ -274,30 +293,6 @@ const deleteTask = (taskId) => {
                         </button>
                     </div>
                 </nav>
-
-                <div class="mt-auto mx-4 mb-4 p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="text-xl">🚀</span>
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">Versión 2.0</h4>
-                    </div>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                        Nuestro equipo está trabajando en las siguientes características para la próxima gran actualización:
-                    </p>
-                    <ul class="space-y-2 mb-4">
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Modo colaborativo
-                        </li>
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Sincronización Offline
-                        </li>
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Notificaciones Push
-                        </li>
-                    </ul>
-                </div>
             </div>
 
             <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2 flex-shrink-0">
@@ -526,7 +521,28 @@ const deleteTask = (taskId) => {
                                     {{ task.due_date }}
                                 </span>
                             </div>
-                        </div>
+
+                            <div v-if="task.subtasks" class="mt-4 pl-4 border-l-2 border-indigo-100 dark:border-indigo-900/50 space-y-2" :class="{'opacity-50': task.status === 'completed'}">
+                                <div v-for="sub in task.subtasks" :key="sub.id" class="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox" 
+                                        :checked="sub.is_completed" 
+                                        @change="toggleSubtask(sub.id)"
+                                        class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer"
+                                    >
+                                    <span :class="['text-sm transition-all', sub.is_completed ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-gray-300']">
+                                        {{ sub.title }}
+                                    </span>
+                                </div>
+                                
+                                <input 
+                                    type="text" 
+                                    placeholder="Añadir subtarea y pulsar Enter..." 
+                                    @keyup.enter="addSubtask(task.id, $event)"
+                                    class="mt-1 w-full text-sm bg-transparent border-none focus:ring-0 text-gray-600 dark:text-gray-400 placeholder-gray-400 dark:placeholder-gray-600 px-0 outline-none"
+                                >
+                            </div>
+                            </div>
 
                         <div class="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                             <button @click="openEditModal(task)" :class="['text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-400/10 rounded-lg transition-colors', listDensity === 'Compacta' ? 'p-1.5' : 'p-2.5']" title="Editar tarea">

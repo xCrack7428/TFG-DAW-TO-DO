@@ -16,8 +16,9 @@ class TaskController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
-        $tasks = $user->tasks()->latest()->get();
+
+        // ¡LA MAGIA AQUÍ!: Añadimos with('subtasks') para enviar las subtareas a Vue
+        $tasks = $user->tasks()->with('subtasks')->latest()->get();
 
         return Inertia::render('Dashboard', [
             'tasks' => $tasks
@@ -39,7 +40,7 @@ class TaskController extends Controller
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         $user->tasks()->create($validated);
 
         return redirect()->route('dashboard');
