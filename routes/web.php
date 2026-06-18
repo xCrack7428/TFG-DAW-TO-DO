@@ -61,4 +61,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/tasks/{task}/subtasks', [App\Http\Controllers\SubtaskController::class, 'store'])->name('subtasks.store');
 Route::patch('/subtasks/{subtask}/toggle', [App\Http\Controllers\SubtaskController::class, 'toggle'])->name('subtasks.toggle');
 
+// Ruta para estadísticas
+Route::get('/stats', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('stats.index');
+
 require __DIR__ . '/auth.php';

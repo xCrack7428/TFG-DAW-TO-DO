@@ -102,42 +102,18 @@ const saveSettings = () => {
                         <span class="text-lg">⬅️</span> Volver al Dashboard
                     </Link>
                 </nav>
-
-                <!-- CARTEL DE NOVEDADES AMPLIADO -->
-                <div class="mt-auto mx-4 mb-4 p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="text-xl">🚀</span>
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">Versión 2.0</h4>
-                    </div>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                        Nuestro equipo está trabajando en las siguientes características para la próxima gran actualización:
-                    </p>
-                    <ul class="space-y-2 mb-4">
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Modo colaborativo
-                        </li>
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Sincronización Offline
-                        </li>
-                        <li class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Notificaciones Push
-                        </li>
-                    </ul>
-                </div>
             </div>
 
-            <!-- Botón de Comunidad y Ajustes -->
+
+            <!-- Botón de Estadísticas y Ajustes -->
             <div class="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2 flex-shrink-0">
-                <Link :href="route('reviews.index')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 rounded-lg transition-colors">
-                    ⭐ Comunidad
-                </Link>
-                <div class="flex items-center gap-3 px-4 py-2 bg-indigo-50 dark:bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 dark:border-indigo-500 rounded-lg font-semibold">
-                    ⚙️ Ajustes
-                </div>
-            </div>
+            <Link :href="route('stats.index')" class="flex items-center gap-3 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-lg transition-colors">
+                📊 Estadísticas
+            </Link>
+            <Link :href="route('profile.edit')" class="flex items-center gap-3 px-4 py-2 bg-indigo-50 dark:bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border-l-2 border-indigo-600 dark:border-indigo-500 font-semibold rounded-lg transition-colors">
+                ⚙️ Ajustes
+            </Link>
+        </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden relative">

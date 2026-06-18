@@ -40,7 +40,7 @@ class AIAssistantController extends Controller
                 })->implode(', ');
             }
 
-            // EL PROMPT CON REGLAS DE PRIORIDAD
+            // EL PROMPT para el comportamiento de la IA, incluyendo las reglas estrictas y el contexto de las tareas actuales
             $prompt = "Eres un coach de productividad para la app DAW TO DO. El usuario está en la sección '$tab' y sus tareas pendientes $contextoTexto son: $tareasActuales. 
             REGLAS ESTRICTAS:
             1. Responde ÚNICAMENTE en formato JSON. Nada de texto fuera del JSON.
@@ -50,6 +50,7 @@ class AIAssistantController extends Controller
             5. A veces (aleatoriamente, 50% de las veces), sugiere una tarea nueva positiva que el usuario no tenga (ej: 'Leer 10 páginas', 'Beber agua'). Si quieres sugerirla, pon el título en 'tarea_sugerida' y su categoría en 'categoria'. En tu 'mensaje' pregúntale si quiere que se la añadas (ignorando la regla 4).
             6. Si no vas a sugerir ninguna tarea, asegúrate de que el valor de 'tarea_sugerida' sea null (el valor nulo de JSON, nunca la palabra \"null\" escrita).";
 
+            // LLAMADA A LA API DE GROQ
             $response = Http::withoutVerifying()
                 ->withToken(env('GROQ_API_KEY'))
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
@@ -64,6 +65,7 @@ class AIAssistantController extends Controller
                     'temperature' => 0.8, 
                 ]);
 
+                // Manejo de errores de la respuesta de la API
             if (!$response->successful()) {
                 return response()->json([
                     'success' => false,
@@ -73,6 +75,7 @@ class AIAssistantController extends Controller
 
             $aiData = json_decode($response->json()['choices'][0]['message']['content'], true);
 
+            // Validación de la estructura del JSON recibido
             return response()->json([
                 'success' => true,
                 'message' => $aiData['mensaje'] ?? 'Aquí tienes tu consejo.',
